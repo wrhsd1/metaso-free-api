@@ -19,14 +19,6 @@ const updateToken = () => {
     });
 }
 
-fs.watch(path.join('/mnt', 'cookie.txt'), (eventType, filename) => {
-    if (eventType === 'change') {
-        updateToken();
-    }
-});
-
-updateToken();
-
 export default {
 
     prefix: '/v1/chat',
@@ -34,6 +26,7 @@ export default {
     post: {
 
         '/completions': async (request: Request) => {
+            updateToken(); 
             request
                 .validate('body.model', v => _.isUndefined(v) || _.isString(v))
                 .validate('body.messages', _.isArray)
