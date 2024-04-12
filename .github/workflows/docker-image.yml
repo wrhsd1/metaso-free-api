@@ -1,8 +1,6 @@
 name: Build and Push Docker Image
 
 on:
-  release:
-    types: [created]
   workflow_dispatch:
     inputs:
       tag:
@@ -40,7 +38,7 @@ jobs:
         file: ./Dockerfile
         push: true
         tags: |
-          vinlic/metaso-free-api:${{ steps.tag_name.outputs.tag }}
-          vinlic/metaso-free-api:latest
+          wrhsd/metaso-free-api:${{ steps.tag_name.outputs.tag }}
+          wrhsd/metaso-free-api:latest
         platforms: linux/amd64,linux/arm64
         build-args: TARGETPLATFORM=${{ matrix.platform }}
