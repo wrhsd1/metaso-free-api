@@ -1,9 +1,31 @@
 import _ from 'lodash';
+import fs from 'fs';
+import path from 'path';
 
 import Request from '@/lib/request/Request.ts';
 import Response from '@/lib/response/Response.ts';
 import chat from '@/api/controllers/chat.ts';
 import logger from '@/lib/logger.ts';
+
+let token: string | undefined;
+
+const updateToken = () => {
+    fs.readFile(path.join('/mnt', 'cookie.txt'), 'utf8', (err, data) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        token = data.trim();
+    });
+}
+
+fs.watch(path.join('/mnt', 'cookie.txt'), (eventType, filename) => {
+    if (eventType === 'change') {
+        updateToken();
+    }
+});
+
+updateToken();
 
 export default {
 
@@ -17,10 +39,6 @@ export default {
                 .validate('body.messages', _.isArray)
                 .validate('body.tempature', v => _.isUndefined(v) || _.isNumber(v))
                 .validate('headers.authorization', _.isString)
-            // token切分
-            const tokens = chat.tokenSplit(request.headers.authorization);
-            // 随机挑选一个token
-            const token = _.sample(tokens);
             const { model, messages, stream, tempature } = request.body;;
             if (stream) {
                 const stream = await chat.createCompletionStream(model, messages, token, tempature);
